@@ -1,0 +1,51 @@
+services:
+  demo:
+  wms:
+    md:
+      title: STAC HDF5 overlay
+      abstract: Latest HDF5 raster asset from a STAC-style API.
+
+globals:
+  http:
+    client_timeout: 30
+  cache:
+    base_dir: /tmp/mapproxy/cache_data
+
+grids:
+  webmercator:
+    base: GLOBAL_WEBMERCATOR
+  geodetic:
+    base: GLOBAL_GEODETIC
+
+sources:
+  stac_hdf5_latest:
+    type: stac_hdf5
+    req:
+      url: https://opendataapi.dmi.dk/v1/radardata
+      collection: composite
+      params:
+        scanType: fullRange
+    opacity: 170
+    coverage:
+      bbox: [7.0, 54.0, 16.0, 58.0]
+      srs: EPSG:4326
+    on_error:
+      other:
+        response: transparent
+        cache: false
+
+caches:
+  stac_hdf5_cache:
+    sources: [stac_hdf5_latest]
+    grids: [webmercator, geodetic]
+    format: image/png
+    image:
+      transparent: true
+
+layers:
+  - name: stac_hdf5
+    title: STAC HDF5
+    sources: [stac_hdf5_cache]
+  - name: stac_hdf5_direct
+    title: STAC HDF5 direct source
+    sources: [stac_hdf5_latest]

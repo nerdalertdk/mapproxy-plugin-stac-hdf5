@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mapproxy-plugin-stac-hdf5"
+version = "0.1.0"
+description = "MapProxy source plugin for STAC HDF5 raster overlays"
+readme = "README.md"
+requires-python = ">=3.9"
+license = "GPL-3.0-or-later"
+authors = [
+  { name = "Stefan Gofferje" }
+]
+dependencies = [
+  "MapProxy>=6,<7",
+  "Pillow>=10",
+  "h5py>=3",
+  "numpy>=1.24",
+]
+
+[project.entry-points.mapproxy]
+stac_hdf5 = "mapproxy_stac_hdf5.plugin"
+
+[project.optional-dependencies]
+test = [
+  "pytest>=8",
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["mapproxy_stac_hdf5*"]
