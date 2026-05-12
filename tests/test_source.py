@@ -3,13 +3,14 @@ from pathlib import Path
 
 import h5py
 import numpy as np
+from mapproxy.layer import MapQuery
 from mapproxy.srs import SRS
 import pytest
 
 from mapproxy.config.loader import ConfigurationError
 from mapproxy.config.loader import load_configuration
 from mapproxy_stac_hdf5.plugin import plugin_entrypoint
-from mapproxy_stac_hdf5.source import StacHdf5Source, crop_to_bbox, hdf5_data_to_rgba, read_hdf5_array
+from mapproxy_stac_hdf5.source import StacHdf5Item, StacHdf5Source, crop_to_bbox, hdf5_data_to_rgba, read_hdf5_array
 
 
 class DummyCoverage:
@@ -63,6 +64,78 @@ def test_crop_to_bbox_places_intersection_in_requested_canvas():
 
     assert alpha[:, :5].max() == 170
     assert alpha[:, 5:].max() == 0
+
+
+def test_direct_source_reprojects_non_4326_requests(monkeypatch, tmp_path: Path):
+    monkeypatch.setattr("mapproxy_stac_hdf5.source.read_hdf5_array", lambda _path: np.ones((64, 64), dtype="float32"))
+
+    class TestSource(StacHdf5Source):
+        def latest_item(self):
+            return StacHdf5Item(
+                item_id="sample.h5",
+                href="https://example.test/sample.h5",
+                bbox=(7.0, 54.0, 16.0, 58.0),
+                timestamp="2026-05-12T10:35:00Z",
+            )
+
+        def download_item(self, item):
+            return tmp_path / item.item_id
+
+    source = TestSource(
+        {
+            "req": {
+                "url": "https://example.test/stac",
+                "collection": "collection",
+            }
+        }
+    )
+    query = MapQuery(
+        (779236.435552915, 7170156.2939999495, 1781111.8526923778, 7967317.535015908),
+        (256, 256),
+        SRS(3857),
+        "image/png",
+    )
+
+    image = source.get_map(query).as_image()
+
+    assert image.size == (256, 256)
+    assert image.getbbox() is not None
+
+
+def test_direct_source_supports_crs84_requests(monkeypatch, tmp_path: Path):
+    monkeypatch.setattr("mapproxy_stac_hdf5.source.read_hdf5_array", lambda _path: np.ones((64, 64), dtype="float32"))
+
+    class TestSource(StacHdf5Source):
+        def latest_item(self):
+            return StacHdf5Item(
+                item_id="sample.h5",
+                href="https://example.test/sample.h5",
+                bbox=(7.0, 54.0, 16.0, 58.0),
+                timestamp="2026-05-12T10:35:00Z",
+            )
+
+        def download_item(self, item):
+            return tmp_path / item.item_id
+
+    source = TestSource(
+        {
+            "req": {
+                "url": "https://example.test/stac",
+                "collection": "collection",
+            }
+        }
+    )
+    query = MapQuery(
+        (7.0, 54.0, 16.0, 58.0),
+        (256, 256),
+        SRS("CRS:84"),
+        "image/png",
+    )
+
+    image = source.get_map(query).as_image()
+
+    assert image.size == (256, 256)
+    assert image.getbbox() is not None
 
 
 def test_source_uses_req_options_and_coverage_bbox(monkeypatch, tmp_path: Path):

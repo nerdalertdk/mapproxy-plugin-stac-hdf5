@@ -4,6 +4,15 @@ services:
     md:
       title: STAC HDF5 overlay
       abstract: Latest HDF5 raster asset from a STAC-style API.
+    srs: ['EPSG:3857', 'EPSG:4326', 'CRS:84']
+    image_formats: ['image/png']
+    bbox_srs:
+      - srs: 'EPSG:4326'
+        bbox: [2.47842, 53.015, 17.5578, 58.6403]
+      - srs: 'CRS:84'
+        bbox: [2.47842, 53.015, 17.5578, 58.6403]
+    format: image/png
+    request_format: image/png
 
 globals:
   http:
@@ -12,8 +21,6 @@ globals:
     base_dir: /tmp/mapproxy/cache_data
 
 grids:
-  webmercator:
-    base: GLOBAL_WEBMERCATOR
   geodetic:
     base: GLOBAL_GEODETIC
 
@@ -37,7 +44,7 @@ sources:
 caches:
   stac_hdf5_cache:
     sources: [stac_hdf5_latest]
-    grids: [webmercator, geodetic]
+    grids: [geodetic]
     format: image/png
     image:
       transparent: true
@@ -46,6 +53,11 @@ layers:
   - name: stac_hdf5
     title: STAC HDF5
     sources: [stac_hdf5_cache]
+
+  - name: grg_stac_hdf5
+    title: grg_STAC_HDF5
+    sources: [stac_hdf5_cache]
+    
   - name: stac_hdf5_direct
     title: STAC HDF5 direct source
     sources: [stac_hdf5_latest]

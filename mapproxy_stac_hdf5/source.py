@@ -21,7 +21,7 @@ from mapproxy.client.http import HTTPClient
 from mapproxy.config.loader import ConfigurationError, SourceConfiguration
 from mapproxy.image.opts import ImageOptions
 from mapproxy.layer import MapExtent
-from mapproxy.srs import SRS
+from mapproxy.srs import SRS, SupportedSRS
 from mapproxy.source.wms import WMSLikeSource
 
 
@@ -70,11 +70,13 @@ class StacHdf5Source(WMSLikeSource):
     def __init__(self, conf: dict[str, Any], coverage=None, image_opts=None, http_client=None, error_handler=None):
         image_opts = image_opts or ImageOptions(format="image/png", transparent=True)
         image_opts.transparent = True
+        if image_opts.resampling is None:
+            image_opts.resampling = "bilinear"
         WMSLikeSource.__init__(
             self,
             image_opts=image_opts,
             coverage=coverage,
-            supported_srs=[SRS(4326)],
+            supported_srs=SupportedSRS([SRS(4326)]),
             supported_formats=["image/png"],
             error_handler=error_handler,
         )

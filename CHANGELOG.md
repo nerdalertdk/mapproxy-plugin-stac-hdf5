@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.1 - 2026-05-12
+
+- Fixed direct `stac_hdf5` layer reprojection for non-`EPSG:4326` requests by using MapProxy's `SupportedSRS` wrapper and a default resampling mode.
+- Added `CRS:84` WMS service support to the example config and a regression test for direct `CRS:84` requests.
+
 ## 0.1.0 - 2026-05-12
 
 - Created a MapProxy plugin project for serving HDF5 raster assets from a STAC-style API as WMS overlays.
