@@ -15,6 +15,11 @@ This repository contains a MapProxy plugin that registers the `stac_hdf5` source
 - Preserve backwards compatibility for existing top-level source options when adding new `req:` options.
 - Avoid committing local runtime artifacts: `.venv/`, `.pytest_cache/`, `*.egg-info/`, and HDF5 cache files.
 
+## Release Workflow
+
+- Run `.venv/bin/python -m pytest` before release commits.
+- Create and push a version tag, for example `0.1.0`, to run the GitHub Actions build and create a GitHub Release with the wheel and source distribution attached.
+
 ## STAC/HDF5 Notes
 
 - The plugin is generic and white-label: do not add provider presets yet.

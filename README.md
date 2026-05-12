@@ -122,10 +122,6 @@ The compose file binds port `80`; change the port mapping if that port is alread
 docker compose down
 ```
 
-## Release
-
-Create and push a version tag, for example `0.1.0`, to run the GitHub Actions build and create a GitHub Release with the wheel and source distribution attached.
-
 ## Notes
 
 The renderer uses common HDF5/ODIM metadata (`gain`, `offset`, `nodata`, `undetect`) when present and falls back to the first 2D numeric dataset named `data` if the file layout varies.
