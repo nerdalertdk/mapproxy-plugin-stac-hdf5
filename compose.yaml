@@ -1,0 +1,8 @@
+services:
+  mapproxy:
+    build: .
+    image: mapproxy-plugin-stac-hdf5:local
+    volumes:
+      - ./examples/:/mapproxy/config/:ro
+    ports:
+      - 80:80
